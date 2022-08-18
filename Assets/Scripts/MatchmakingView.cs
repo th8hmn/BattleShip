@@ -56,7 +56,7 @@ public class MatchmakingView : MonoBehaviourPunCallbacks
 
         // ルームを非公開に設定する（新規でルームを作成する場合）
         var roomOptions = new RoomOptions();
-        roomOptions.MaxPlayers = 2;
+        roomOptions.MaxPlayers = 4;
         roomOptions.IsVisible = false;
 
         // パスワードと同じ名前のルームに参加する（ルームが存在しなければ作成してから参加する）

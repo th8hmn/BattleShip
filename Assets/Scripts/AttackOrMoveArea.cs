@@ -311,8 +311,8 @@ public class AttackOrMoveArea : MonoBehaviour
     {
         string logText;
 
-        string col = PositionManager.GetChartAlphabet(Index[1]);
-        int row = Index[0] + 1;
+        string col = PositionManager.GetChartAlphabet(Index[0]);
+        int row = Index[1] + 1;
 
 #if UNITY_WEBGL
         logText = "  " + playerName + " : "
@@ -336,8 +336,8 @@ public class AttackOrMoveArea : MonoBehaviour
     {
         string logText;
 
-        string col = PositionManager.GetChartAlphabet(index[1]);
-        int row = index[0] + 1;
+        string col = PositionManager.GetChartAlphabet(index[0]);
+        int row = index[1] + 1;
         string shipName = "";
         for (int i = 0; i < shipNames.Length; i++)
         {
@@ -380,8 +380,8 @@ public class AttackOrMoveArea : MonoBehaviour
     {
         string logText;
 
-        string col = PositionManager.GetChartAlphabet(index[1]);
-        int row = index[0] + 1;
+        string col = PositionManager.GetChartAlphabet(index[0]);
+        int row = index[1] + 1;
 
 #if UNITY_WEBGL
         logText = "  " + playerName + " : "

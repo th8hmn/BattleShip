@@ -34,7 +34,11 @@ public class Select : MonoBehaviour
     // 選択ブロックを色付けするか判断する
     public  bool SelectJudge(GamePlayer player, bool selectedShip)
     {
-        if (player.selectPhase <= 3 )
+        if (player.id > 2)
+        {
+            return false;
+        }
+        else if (player.selectPhase <= 3 )
         {
             return true;
         }

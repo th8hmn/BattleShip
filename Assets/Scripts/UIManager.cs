@@ -11,6 +11,8 @@ public class UIManager : MonoBehaviour
     public GameObject attackBtn;
     public GameObject moveBtn;
 
+    public GameObject pleaseWait;
+    private Text pleaseWaitTxt;
     public GameObject instruct1;
     private Text instruct1Txt;
     public GameObject instruct2;
@@ -50,7 +52,9 @@ public class UIManager : MonoBehaviour
         attackBtn.SetActive(false);
         moveBtn.SetActive(false);
 
-        instruct1.SetActive(true);
+        pleaseWait.SetActive(true);
+        pleaseWaitTxt = pleaseWait.GetComponent<Text>();
+        instruct1.SetActive(false);
         instruct1Txt = instruct1.GetComponent<Text>();
 
         instruct2.SetActive(false);
@@ -62,7 +66,7 @@ public class UIManager : MonoBehaviour
         instruct4.SetActive(false);
         instruct4Txt = instruct4.GetComponent<Text>();
 
-        instructPanelObj.SetActive(false);
+        instructPanelObj.SetActive(true);
 
         scrollViewObj.SetActive(false);
         GameObject viewPortObj = scrollViewObj.transform.GetChild(0).gameObject;
@@ -123,8 +127,8 @@ public class UIManager : MonoBehaviour
     public void GoSelectPhase1()
     {
         // 進んだときに表示を変更
+        pleaseWait.SetActive(false);
         instruct1.SetActive(true);
-        instructPanelObj.SetActive(true);
 
         // 戻ったときに非表示にする
         instruct2.SetActive(false);
@@ -238,13 +242,22 @@ public class UIManager : MonoBehaviour
     }
 
     // 配置完了後、ゲーム開始状態に遷移
-    public void GoActionPhase()
+    public void GoActionPhase(int playerId)
     {
         backBtn.SetActive(false);
         deployCompBtn.SetActive(false);
         instruct4.SetActive(false);
         instructPanelObj.SetActive(false);
-        HPTextObj.SetActive(true);
+        pleaseWaitTxt.text = player2Name.text + "'s " + "Turn";
+        if (playerId <= 2)  // ゲーム開始時、3人目がいた場合、HPを表示させない
+        {
+            HPTextObj.SetActive(true);
+        }
+        else                // ゲーム開始時、3人目以降の場合、ログ以外消す
+        {
+            instruct1.SetActive(false);
+            instructPanelObj.SetActive(false);
+        }
         //hpDispObj.SetActive(true);
         scrollViewObj.SetActive(true);
     }
@@ -252,15 +265,26 @@ public class UIManager : MonoBehaviour
     // ターン開始時に、攻撃・移動ボタンを表示
     public void StartTurn()
     {
+        pleaseWait.SetActive(false);
         attackBtn.SetActive(true);
         moveBtn.SetActive(true);
     }
 
     // ターン終了時に、攻撃・移動ボタンを非表示
-    public void FinishTurn()
+    public void FinishTurn(bool isFinish)
     {
         attackBtn.SetActive(false);
         moveBtn.SetActive(false);
+        if (!isFinish)
+        {
+            pleaseWait.SetActive(true);
+        }
+    }
+
+    // エフェクト表示前に相手ターンであることの表示を隠す
+    public void HideWaitText()
+    {
+        pleaseWait.SetActive(false);
     }
 
     // ゲーム終了時、ゲーム終了のテキストを表示

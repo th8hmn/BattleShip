@@ -20,6 +20,9 @@ public class GameMaster : MonoBehaviour
     private bool selectedShip;
     private bool isArea;
     private bool isClear;
+    private string destroyedShip;
+    private bool _hitFlag;
+    private string _attackObjName;
 
     private bool isFinish;
 
@@ -71,6 +74,9 @@ public class GameMaster : MonoBehaviour
         selectedShip = false;
         isArea = false;
         isClear = false;
+        destroyedShip = NameDefinition.NOTSET;
+        _hitFlag = false;
+        _attackObjName = NameDefinition.NOTSET;
 
         isFinish = false;
 
@@ -123,6 +129,10 @@ public class GameMaster : MonoBehaviour
                     {
                         select.SelectArea(player);
                     }
+                    else if (player.id > 2)     // 3人目以降はログ以外の表示を消す
+                    {
+                        uIManager.GoActionPhase(player.id);
+                    }
 
                     // 配置選択の遷移
                     if (player.selectPhase == 1)
@@ -153,7 +163,7 @@ public class GameMaster : MonoBehaviour
                 // 配置完了ボタンを非表示
                 if (player.readyForBattle)
                 {
-                    uIManager.GoActionPhase();
+                    uIManager.GoActionPhase(player.id);
                     uIManager.DisplayHP(player);
 #if (UNITY_WEBGL)
                     webGLHelp.SetActive(true);
@@ -161,33 +171,42 @@ public class GameMaster : MonoBehaviour
                 }
 
                 // 攻撃ヒット時にエフェクト表示
-                if (player.myturnFlag && player.hitFlag)
+                if (player.myturnFlag && _hitFlag)
                 {
                     // エフェクト表示位置設定
                     int[] address = new int[2];
                     Vector3 pos;
-                    address = PositionManager.GetAddressFromGameObjectName(player.attackObjName);
+                    address = PositionManager.GetAddressFromGameObjectName(_attackObjName);
                     pos = PositionManager.GetPositionFromIndex(address);
 
                     // エフェクト表示
+                    uIManager.HideWaitText();
                     effectManager.PlayExplosionEffect(pos);
                     particlePlaying = true;     // エフェクト表示中フラグ
 
                     // 破壊する船が設定されていたら破壊する
-                    if (player.destroyedShipName != NameDefinition.NOTSET)
+                    if (destroyedShip != NameDefinition.NOTSET)
                     {
-                        attackOrMoveArea.DestroyShips(player, player.destroyedShipName);
+                        attackOrMoveArea.DestroyShips(player, destroyedShip);
+                        destroyedShip = NameDefinition.NOTSET;
                     }
 
-                    player.hitFlag = false;
+                    _hitFlag = false;
                 }
 
                 // 攻撃と移動のボタンを表示/非表示
                 if (player.finishGameFlag && !isFinish)  // ゲーム終了の場合
                 {
-                    string finishText = "You lose...";
-                    uIManager.EndGame(finishText);
-                    isFinish = true;
+                    if (particlePlaying)    // エフェクト中の場合
+                    {
+                        if (particleStopped)    // エフェクトが完了したら
+                        {
+                            string finishText = "You lose...";
+                            uIManager.EndGame(finishText);
+                            isFinish = true;
+                            particlePlaying = false;
+                        }
+                    }
                 }
                 else                       // ゲーム終了でない場合
                 {
@@ -209,7 +228,7 @@ public class GameMaster : MonoBehaviour
                     }
                     else if (player.readyForBattle && !player.myturnFlag)   // 相手ターンに非表示
                     {
-                        uIManager.FinishTurn();
+                        uIManager.FinishTurn(isFinish);
                     }
                 }
 
@@ -478,20 +497,22 @@ public class GameMaster : MonoBehaviour
                 {
                     GameObject tmpPlayerObj = players[j];
                     GamePlayer tmpPlayer = tmpPlayerObj.GetComponent<GamePlayer>();
-                    if (tmpPlayer.id <= 2 && tmpPlayer.id != player.id)
+                    if (tmpPlayer.id != player.id)
                     {
                         // 攻撃が当たった場合、HPの更新
-                        if (player.hitFlag)
+                        if (player.hitFlag && tmpPlayer.id <= 2)
                         {
-                            tmpPlayer.hitFlag = true;
-                            tmpPlayer.attackObjName = player.attackObjName;
+                            _hitFlag = true;
+                            _attackObjName = player.attackObjName;
                             for (int k = 0; k < player.shipsHP.Length; k++)
                             {
                                 tmpPlayer.shipsHP[k] = player.opponentShipsHP[k];
                             }
-                            tmpPlayer.destroyedShipName = player.destroyedShipName;
+                            destroyedShip = player.destroyedShipName;
                             tmpPlayer.finishGameFlag = player.finishGameFlag;
                             player.hitFlag = false;
+                            player.destroyedShipName = NameDefinition.NOTSET;
+                            player.attackObjName = NameDefinition.NOTSET;
                         }
                         // ログの更新
                         if (player.logUpdateFlag)
