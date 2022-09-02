@@ -9,7 +9,9 @@ public class KeyboardManager : MonoBehaviour
 {
     private TouchScreenKeyboard keyboard;
     public TMP_InputField passwordInputField;
+    public TMP_InputField passwordInputField2;
     public TMP_InputField playernameInputField;
+    public TMP_InputField playernameInputField2;
 
     //ƒXƒ}ƒz‚©‚Ç‚¤‚©‚ð•Û‘¶‚µ‚Ä‚¨‚­
     public bool IsSmartPhone { get; private set; } = false;
@@ -71,6 +73,7 @@ public class KeyboardManager : MonoBehaviour
         if (!TouchScreenKeyboard.isSupported)
         {
             passwordInputField.text = GetSomeInput(passwordInputField.text);
+            passwordInputField2.text = GetSomeInput(passwordInputField2.text);
             //playernameInputField.text = GetSomeName(playernameInputField.text);
         }
 #endif
@@ -85,6 +88,7 @@ public class KeyboardManager : MonoBehaviour
         {
             //passwordInputField.text = GetSomeInput(passwordInputField.text);
             playernameInputField.text = GetSomeName(playernameInputField.text);
+            playernameInputField2.text = GetSomeName(playernameInputField2.text);
         }
 #endif
     }

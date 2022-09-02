@@ -14,7 +14,7 @@ public static class PositionManager
         { {2, 2}, {2, 1}, {2, 0}, {2, -1}, {2, -2} }
     };
 
-    public static int INITPOSITION = 255;
+    public static int INITPOSITION = 8;
     public static string NOTSET = "not setted";
 
     //ブロックオブジェクトの名前からブロックの場所のインデックスを取得する

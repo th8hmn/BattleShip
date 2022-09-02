@@ -8,6 +8,8 @@ public class DisplaySetting : MonoBehaviour
     private Camera mainCamera;
     public GameObject canvasObj;
     public GameObject canvasObj2;
+    public GameObject canvasObj3;
+    public GameObject canvasObj4;
     private Vector3 scale;
 
     private float offset = -0.25f;
@@ -60,6 +62,18 @@ public class DisplaySetting : MonoBehaviour
 
         RectTransform textRect2 = canvasObj2.GetComponent<RectTransform>();
         textRect2.sizeDelta = new Vector2(width / ratio, textRect2.sizeDelta.y);
+
+        RectTransform textRect3 = canvasObj3.GetComponent<RectTransform>();
+        textRect3.sizeDelta = new Vector2(width / ratio, textRect3.sizeDelta.y);
+        Vector3 canvasPos3 = canvasObj3.transform.position;
+        canvasPos3.x += offset;
+        canvasObj3.transform.position = canvasPos3;
+
+        RectTransform textRect4 = canvasObj4.GetComponent<RectTransform>();
+        textRect4.sizeDelta = new Vector2(width / ratio, textRect4.sizeDelta.y);
+        Vector3 canvasPos4 = canvasObj4.transform.position;
+        canvasPos4.x += offset;
+        canvasObj4.transform.position = canvasPos4;
     }
 
     // Update is called once per frame

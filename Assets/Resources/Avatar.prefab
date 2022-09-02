@@ -72,6 +72,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   rand: 0
   isSetup: 0
+  hideSubmarineOpt: 0
+  noteOpt: 0
   selectPhase: 0
   readyForBattle: 0
   attackFlag: 0
@@ -131,6 +133,7 @@ MonoBehaviour:
   decision: 0
   sendData: 0
   logText: 
+  logText2: 
   logUpdateFlag: 0
   id: 0
   playerName: 

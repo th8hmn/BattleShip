@@ -4,34 +4,44 @@ using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 
-public class MatchmakingView : MonoBehaviourPunCallbacks
+public class CreateRoomView : MonoBehaviourPunCallbacks
 {
     [SerializeField]
-    private TMP_InputField passwordInputField = default;
+    private TMP_InputField roomInputField = default;
     [SerializeField]
     private TMP_InputField playerNameInputField = default;
     [SerializeField]
-    private Button joinRoomButton = default;
+    private Button createRoomButton = default;
+    [SerializeField]
+    private Toggle hideSubmarineToggle = default;
+    [SerializeField]
+    private Toggle noteToggle = default;
 
     private CanvasGroup canvasGroup;
 
     [SerializeField]
-    private GameObject createRoomView = default;
+    private GameObject joinRoomView = default;
     [SerializeField]
     private GameObject switchUI = default;
+    [SerializeField]
+    private GameObject noteToggleObj = default;
 
-    private void Start()
+    void Start()
     {
         canvasGroup = GetComponent<CanvasGroup>();
         // マスターサーバーに接続するまでは、入力できないようにする
         canvasGroup.interactable = false;
 
         // パスワードを入力する前は、ルーム参加ボタンを押せないようにする
-        joinRoomButton.interactable = false;
+        createRoomButton.interactable = false;
 
-        passwordInputField.onValueChanged.AddListener(OnPasswordInputFieldValueChanged);
+        roomInputField.onValueChanged.AddListener(OnRoomInputFieldValueChanged);
         playerNameInputField.onValueChanged.AddListener(OnPlayerNmaeInputFieldValueChanged);
-        joinRoomButton.onClick.AddListener(OnJoinRoomButtonClick);
+        createRoomButton.onClick.AddListener(OnCreateRoomButtonClick);
+
+#if (UNITY_WEBGL)
+        noteToggleObj.SetActive(false);
+#endif
     }
 
     public override void OnConnectedToMaster()
@@ -40,21 +50,21 @@ public class MatchmakingView : MonoBehaviourPunCallbacks
         canvasGroup.interactable = true;
     }
 
-    private void OnPasswordInputFieldValueChanged(string value)
+    private void OnRoomInputFieldValueChanged(string value)
     {
         // パスワードを1桁以上入力した時のみ、ルーム参加ボタンを押せるようにする
-        joinRoomButton.interactable = (value.Length > 0);
-        joinRoomButton.interactable = (playerNameInputField.text.Length > 0);
+        createRoomButton.interactable = (value.Length > 0);
+        createRoomButton.interactable = (playerNameInputField.text.Length > 0);
     }
 
     private void OnPlayerNmaeInputFieldValueChanged(string value)
     {
         // パスワードを1桁以上入力した時のみ、ルーム参加ボタンを押せるようにする
-        joinRoomButton.interactable = (value.Length > 0);
-        joinRoomButton.interactable = (passwordInputField.text.Length > 0);
+        createRoomButton.interactable = (value.Length > 0);
+        createRoomButton.interactable = (roomInputField.text.Length > 0);
     }
 
-    private void OnJoinRoomButtonClick()
+    private void OnCreateRoomButtonClick()
     {
         // ルーム参加処理中は、入力できないようにする
         canvasGroup.interactable = false;
@@ -65,10 +75,8 @@ public class MatchmakingView : MonoBehaviourPunCallbacks
         roomOptions.IsVisible = false;
 
         // パスワードと同じ名前のルームに参加する（ルームが存在しなければ作成してから参加する）
-        //PhotonNetwork.JoinOrCreateRoom(passwordInputField.text, roomOptions, TypedLobby.Default);
-        // パスワードと同じ名前のルームに参加する
-        PhotonNetwork.JoinRoom(passwordInputField.text);
-        GameSettings.createOrJoin = 2;
+        PhotonNetwork.CreateRoom(roomInputField.text, roomOptions, TypedLobby.Default);
+        GameSettings.createOrJoin = 1;
     }
 
     public override void OnJoinedRoom()
@@ -78,36 +86,34 @@ public class MatchmakingView : MonoBehaviourPunCallbacks
         GameObject g = PhotonNetwork.Instantiate("Avatar", position, Quaternion.identity);
         GamePlayer player = g.GetComponent<GamePlayer>();
         player.playerName = playerNameInputField.text;
+        if (hideSubmarineToggle.isOn)
+        {
+            GameSettings.isHideSubmarine = true;
+        }
+        //else
+        //{
+        //    player.hideSubmarineOpt = 2;
+        //}
+        if (noteToggle.isOn)
+        {
+            GameSettings.isNote = true;
+        }
+        //else
+        //{
+        //    player.noteOpt = 2;
+        //}
 
         // ルームへの参加が成功したら、UIを非表示にする
         gameObject.SetActive(false);
-        createRoomView.SetActive(false);
+        joinRoomView.SetActive(false);
         switchUI.SetActive(false);
     }
 
-    public override void OnJoinRoomFailed(short returnCode, string message)
+    public override void OnCreateRoomFailed(short returnCode, string message)
     {
         // ルームへの参加が失敗したら、パスワードを再び入力できるようにする
-        passwordInputField.text = string.Empty;
+        roomInputField.text = string.Empty;
         canvasGroup.interactable = true;
         GameSettings.createOrJoin = 0;
-    }
-
-    public void Disconnect()
-    {
-        PhotonNetwork.Disconnect();
-    }
-
-    public void Reconnect()
-    {
-        if (!PhotonNetwork.IsConnected)
-        {
-            PhotonNetwork.CurrentRoom.PlayerTtl = 30000;
-            PhotonNetwork.ReconnectAndRejoin();
-        }
-        else
-        {
-            PhotonNetwork.ConnectUsingSettings();
-        }
     }
 }

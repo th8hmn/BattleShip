@@ -7,6 +7,10 @@ public class InitChart : MonoBehaviour
 {
     public GameObject chartObj;
     public GameObject blockObj;
+    public GameObject noteChartObj;
+    private GameObject noteChart1;
+    private GameObject noteChart2;
+    private bool isSet = false;
     private const int num = 5;
 
     private Vector3 chartScale;
@@ -23,6 +27,34 @@ public class InitChart : MonoBehaviour
 
     void Awake()
     {
+        InstantiateChart(this.transform);
+
+        InstantiateChart(noteChartObj.transform);
+        noteChart1 = Instantiate(noteChartObj, new Vector3(6f, 0f, 0f), Quaternion.identity);
+        noteChart2 = Instantiate(noteChartObj, new Vector3(-6f, 0f, 0f), Quaternion.identity);
+        noteChart1.SetActive(false);
+        noteChart2.SetActive(false);
+        Destroy(noteChartObj);
+    }
+    // Start is called before the first frame update
+    void Start()
+    {
+        
+    }
+
+    // Update is called once per frame
+    void Update()
+    {
+        if (GameSettings.isNote & !isSet)
+        {
+            noteChart1.SetActive(true);
+            noteChart2.SetActive(true);
+            isSet = true;
+        }
+    }
+
+    private void InstantiateChart(Transform parentTransform)
+    {
         chartScale = chartObj.transform.localScale;
         blockScale = blockObj.transform.localScale;
         weight = 0.5f;
@@ -34,7 +66,7 @@ public class InitChart : MonoBehaviour
             j * blockScale.y + (blockScale.y + chartScale.y * weight) / 2,
             0f);
         string name1 = NameDefinition.CHART + "0" + "0";
-        CreateChart(pos1, name1, true, true, 0);
+        CreateChart(pos1, name1, true, true, 0, parentTransform);
 
         for (int i = 0; i < num; i++)
         {
@@ -44,7 +76,7 @@ public class InitChart : MonoBehaviour
                 j * blockScale.y + (blockScale.y + chartScale.y * weight) / 2,
                 0f);
             string name2 = NameDefinition.CHART + i.ToString("0") + "_col";
-            CreateChart(pos2, name2, false, true, i);
+            CreateChart(pos2, name2, false, true, i, parentTransform);
 
             // s‚ÌÀ•W‚ðì¬
             Vector3 pos3 = new Vector3
@@ -52,27 +84,16 @@ public class InitChart : MonoBehaviour
                 (i - 2) * chartScale.x,
                 0f);
             string name3 = NameDefinition.CHART + i.ToString("0") + "_row";
-            CreateChart(pos3, name3, true, false, i);
+            CreateChart(pos3, name3, true, false, i, parentTransform);
         }
-    }
-    // Start is called before the first frame update
-    void Start()
-    {
-        
-    }
-
-    // Update is called once per frame
-    void Update()
-    {
-        
     }
 
     // À•Wì¬‚Ìˆ—
-    private void CreateChart(Vector3 position, string name, bool half_x, bool half_y, int idx)
+    private void CreateChart(Vector3 position, string name, bool half_x, bool half_y, int idx, Transform parentTransform)
     {
         GameObject g = Instantiate(chartObj, position, Quaternion.identity);
         g.name = name;
-        g.transform.parent = this.transform;
+        g.transform.parent = parentTransform;
         GameObject canvasObj = g.transform.GetChild(1).gameObject;
         GameObject textObj = canvasObj.transform.GetChild(0).gameObject;
 

@@ -58,6 +58,9 @@ public class GameMaster : MonoBehaviour
 
     public GameObject webGLHelp;
 
+    public GameObject roomSettingsObj;
+    private RoomSettings roomSettings;
+
     // Start is called before the first frame update
     void Start()
     {
@@ -93,6 +96,7 @@ public class GameMaster : MonoBehaviour
         turnManager = turnManagerObj.GetComponent<TurnManager>();
         effectManager = effectManagerObj.GetComponent<EffectManager>();
         gameEnd = gameEndObj.GetComponent<GameEnd>();
+        roomSettings = roomSettingsObj.GetComponent<RoomSettings>();
     }
     // Update is called once per frame
     void Update()
@@ -102,6 +106,10 @@ public class GameMaster : MonoBehaviour
         {
             GameObject playerObj = players[i];
             GamePlayer player = playerObj.GetComponent<GamePlayer>();
+            UnityEngine.Debug.Log(player.hideSubmarineOpt);
+
+            // ルーム設定する
+            roomSettings.SettingOptions(players, player);
 
             // 先攻を決める
             turnManager.DecideFirstPlayer(players, player, debugFlag);
@@ -155,6 +163,12 @@ public class GameMaster : MonoBehaviour
                         // 配置完了ボタン表示
                         uIManager.GoSelectPhase4();
                     }
+                }
+
+                if (player.id > 2)
+                {
+                    uIManager.SetPlayerName(players, player.id);
+                    uIManager.GoActionPhase(player.id);
                 }
 
                 // -------------------------------------
@@ -517,8 +531,29 @@ public class GameMaster : MonoBehaviour
                         // ログの更新
                         if (player.logUpdateFlag)
                         {
+#if (!UNITY_WEBGL)
+                            if (tmpPlayer.id > 2)
+                            {
+                                if (player.id == 1)
+                                {
+                                    tmpPlayer.logText = player.logText;
+                                    uIManager.DisplayLog(tmpPlayer.logText);
+                                }
+                                else if (player.id == 2)
+                                {
+                                    tmpPlayer.logText2 = player.logText;
+                                    uIManager.DisplayLog2(tmpPlayer.logText2);
+                                }
+                            }
+                            else if (tmpPlayer.id <= 2)
+                            {
+                                tmpPlayer.logText2 = player.logText;
+                                uIManager.DisplayLog2(tmpPlayer.logText2);
+                            }
+#else
                             tmpPlayer.logText = player.logText;
                             uIManager.DisplayLog(tmpPlayer.logText);
+#endif
                             player.logUpdateFlag = false;
                         }
                     }                    

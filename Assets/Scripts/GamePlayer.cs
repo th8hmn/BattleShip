@@ -7,6 +7,8 @@ public class GamePlayer : MonoBehaviourPunCallbacks, IPunObservable
 {
     public int rand;
     public bool isSetup;
+    public int hideSubmarineOpt;
+    public int noteOpt;
 
     public int selectPhase;
     public bool readyForBattle;
@@ -38,6 +40,7 @@ public class GamePlayer : MonoBehaviourPunCallbacks, IPunObservable
     public bool sendData;
 
     public string logText;
+    public string logText2;
     public bool logUpdateFlag;
 
     public int id;
@@ -66,6 +69,8 @@ public class GamePlayer : MonoBehaviourPunCallbacks, IPunObservable
 
         rand = 0;
         isSetup = false;
+        hideSubmarineOpt = 0;
+        noteOpt = 0;
 
         selectPhase = 1;
         readyForBattle = false;
@@ -119,6 +124,7 @@ public class GamePlayer : MonoBehaviourPunCallbacks, IPunObservable
         hitFlag = false;
 
         logText = "";
+        logText2 = "";
         logUpdateFlag = false;
 
 #if (UNITY_WEBGL)
@@ -171,6 +177,8 @@ public class GamePlayer : MonoBehaviourPunCallbacks, IPunObservable
         {
             stream.SendNext(this.sendDecision);
             stream.SendNext(this.playerName);
+            stream.SendNext(this.hideSubmarineOpt);
+            stream.SendNext(this.noteOpt);
             stream.SendNext(this.myturnFlag);
             stream.SendNext(this.rand);
             stream.SendNext(this.myturnPlayerID);
@@ -184,6 +192,7 @@ public class GamePlayer : MonoBehaviourPunCallbacks, IPunObservable
             stream.SendNext(this.destroyerIdx);
             stream.SendNext(this.submarineIdx);
             stream.SendNext(this.logText);
+            stream.SendNext(this.logText2);
             stream.SendNext(this.logUpdateFlag);
             stream.SendNext(this.destroyedShipName);
             stream.SendNext(this.finishGameFlag);
@@ -206,6 +215,8 @@ public class GamePlayer : MonoBehaviourPunCallbacks, IPunObservable
         {
             this.decision = (int)stream.ReceiveNext();
             this.playerName = (string)stream.ReceiveNext();
+            this.hideSubmarineOpt = (int)stream.ReceiveNext();
+            this.noteOpt = (int)stream.ReceiveNext();
             this.myturnFlag = (bool)stream.ReceiveNext();
             this.rand = (int)stream.ReceiveNext();
             this.myturnPlayerID = (int)stream.ReceiveNext();
@@ -219,6 +230,7 @@ public class GamePlayer : MonoBehaviourPunCallbacks, IPunObservable
             this.destroyerIdx = (int[])stream.ReceiveNext();
             this.submarineIdx = (int[])stream.ReceiveNext();
             this.logText = (string)stream.ReceiveNext();
+            this.logText2 = (string)stream.ReceiveNext();
             this.logUpdateFlag = (bool)stream.ReceiveNext();
             this.destroyedShipName = (string)stream.ReceiveNext();
             this.finishGameFlag = (bool)stream.ReceiveNext();

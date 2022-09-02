@@ -341,6 +341,10 @@ public class AttackOrMoveArea : MonoBehaviour
         string shipName = "";
         for (int i = 0; i < shipNames.Length; i++)
         {
+            if (i == 2 && GameSettings.isHideSubmarine)
+            {
+                break;
+            }
             if (shipNames[i] != NameDefinition.NOTSET)
             {
                 if (shipName == "")
@@ -364,12 +368,26 @@ public class AttackOrMoveArea : MonoBehaviour
             + row.ToString("0") + col + "\", and splashed water by \""
             + shipName
             +"\"!";
+            
+        if (shipName == "" && GameSettings.isHideSubmarine)
+        {
+            logText = "  " + playerName + " : "
+            + "Attacked \""
+            + row.ToString("0") + col + "\"!";
+        }
 #else
         logText = "  " + playerName + " : "
             + "\""
             + row.ToString("0") + col + "\" ‚ðUŒ‚‚µA\""
             + shipName
             +"\" ‚Ì‹ß‚­‚Å…‚µ‚Ô‚«‚ªã‚ª‚è‚Ü‚µ‚½ ! ";
+
+        if (shipName == "" && GameSettings.isHideSubmarine)
+        {
+            logText = "  " + playerName + " : "
+            + "\""
+            + row.ToString("0") + col + "\" ‚ðUŒ‚‚µ‚Ü‚µ‚½ ! ";
+        }
 #endif
 
         return logText;

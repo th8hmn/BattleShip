@@ -37,9 +37,17 @@ public class UIManager : MonoBehaviour
     public GameObject panelObj;
     public GameObject HPTextObj;
 
+    public GameObject logBaseObj;
+    private GameObject logBaseObj2;
     public GameObject scrollViewObj;
     private ScrollRect scrollRect;
     private Text logTxt;
+    public GameObject scrollViewObj2;
+    private ScrollRect scrollRect2;
+    private Text logTxt2;
+    public GameObject playerNameForLogObj;
+    public Text playerNameForLogTxt1;
+    public Text playerNameForLogTxt2;
 
     public GameObject finishPanelObj;
     private Text finishTxt;
@@ -71,9 +79,23 @@ public class UIManager : MonoBehaviour
         scrollViewObj.SetActive(false);
         GameObject viewPortObj = scrollViewObj.transform.GetChild(0).gameObject;
         scrollRect = scrollViewObj.GetComponent<ScrollRect>();
+#if (!UNITY_WEBGL)
+        logBaseObj2 = Instantiate(logBaseObj, new Vector3(3f, -3f, 0f), Quaternion.identity);
+        GameObject tmp = logBaseObj2.transform.GetChild(0).gameObject;
+        scrollViewObj2 = tmp.transform.GetChild(0).gameObject;
+        scrollViewObj2.SetActive(false);
+        GameObject viewPortObj2 = scrollViewObj2.transform.GetChild(0).gameObject;
+        scrollRect2 = scrollViewObj2.GetComponent<ScrollRect>();
+        logBaseObj.transform.position = new Vector3(-3.5f, -3f, 0f);
+#endif
 
         GameObject logObj = viewPortObj.transform.GetChild(0).gameObject;
         logTxt = logObj.GetComponent<Text>();
+#if (!UNITY_WEBGL)
+        GameObject logObj2 = viewPortObj2.transform.GetChild(0).gameObject;
+        logTxt2 = logObj2.GetComponent<Text>();
+#endif
+        playerNameForLogObj.SetActive(false);
 
         finishPanelObj.SetActive(false);
         GameObject finishTxtObj = finishPanelObj.transform.GetChild(0).gameObject;
@@ -219,9 +241,20 @@ public class UIManager : MonoBehaviour
         {
             GameObject playerObj = players[i];
             GamePlayer player = playerObj.GetComponent<GamePlayer>();
-            if (player.id <= 2)
+            if (player.id <= 2 && myplayerId <= 2)
             {
                 if (player.id == myplayerId)
+                {
+                    player1Name.text = player.playerName;
+                }
+                else
+                {
+                    player2Name.text = player.playerName;
+                }
+            }
+            else if (player.id <= 2 && myplayerId > 2)
+            {
+                if (player.id == 1)
                 {
                     player1Name.text = player.playerName;
                 }
@@ -241,6 +274,16 @@ public class UIManager : MonoBehaviour
         scrollRect.verticalNormalizedPosition = 0;
     }
 
+#if (!UNITY_WEBGL)
+    // ログの登録
+    public void DisplayLog2(string logText)
+    {
+        logTxt2.text = logText;
+        logTxt2.GetComponent<ContentSizeFitter>().SetLayoutVertical();
+        scrollRect2.verticalNormalizedPosition = 0;
+    }
+#endif
+
     // 配置完了後、ゲーム開始状態に遷移
     public void GoActionPhase(int playerId)
     {
@@ -249,17 +292,25 @@ public class UIManager : MonoBehaviour
         instruct4.SetActive(false);
         instructPanelObj.SetActive(false);
         pleaseWaitTxt.text = player2Name.text + "'s " + "Turn";
-        if (playerId <= 2)  // ゲーム開始時、3人目がいた場合、HPを表示させない
-        {
-            HPTextObj.SetActive(true);
-        }
-        else                // ゲーム開始時、3人目以降の場合、ログ以外消す
+        HPTextObj.SetActive(true);
+        if (playerId > 2)  // ゲーム開始時、3人目以降の場合、ログ/HP以外消す
         {
             instruct1.SetActive(false);
             instructPanelObj.SetActive(false);
         }
+        //else                // ゲーム開始時、3人目以降の場合、ログ以外消す
+        //{
+        //    instruct1.SetActive(false);
+        //    instructPanelObj.SetActive(false);
+        //}
         //hpDispObj.SetActive(true);
         scrollViewObj.SetActive(true);
+#if (!UNITY_WEBGL)
+        scrollViewObj2.SetActive(true);
+        playerNameForLogTxt1.text = player1Name.text;
+        playerNameForLogTxt2.text = player2Name.text;
+        playerNameForLogObj.SetActive(true);
+#endif
     }
 
     // ターン開始時に、攻撃・移動ボタンを表示
